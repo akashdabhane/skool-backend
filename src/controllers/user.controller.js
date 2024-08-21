@@ -31,9 +31,9 @@ const options = {
 
 // register user
 const userRegister = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, firstname, lastname } = req.body;
 
-    if ([email, password].some((field) =>
+    if ([email, password, firstname, lastname].some((field) =>
         field?.trim() === "" || field?.trim() === undefined
     )) {
         throw new ApiError(400, "All fields are required");
@@ -46,6 +46,8 @@ const userRegister = asyncHandler(async (req, res) => {
     const user = await User.create({
         email,
         password,
+        firstname,
+        lastname
     })
     console.log(user)
     const createdUser = await User.findById(user._id).select("-password -refreshToken");
@@ -98,7 +100,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $unset: refreshToken
+            $set: { refreshToken: null}
         },
         { new: true }
     )
@@ -174,7 +176,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
         )
 })
 
-
 // get user
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
@@ -210,16 +211,19 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const LocalPhotoPath = req.file?.path;
 
-    const photo = await uploadOnCloudinary(LocalPhotoPath)
+    const photo = await uploadOnCloudinary(LocalPhotoPath);
 
     if (!photo) throw new ApiError(500, "Failed to upload photo");
 
-    const publicId = extractPublicId(req.user.profilePhoto);
-    await deleteFromCloudinary(publicId)
+    if(req.user?.profilePicture) {
+        const publicId = extractPublicId(req.user.profilePicture);
+        await deleteFromCloudinary(publicId);
+    }
+
     const updateProfilePhoto = await User.findByIdAndUpdate(userId,
         {
             $set: {
-                profilePhoto: photo.secure_url,
+                profilePicture: photo.secure_url,
             }
         },
         { new: true }

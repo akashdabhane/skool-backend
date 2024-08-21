@@ -2,7 +2,7 @@ import { v2 as cloudinary } from "cloudinary"
 import fs from "fs"
 import dotenv from "dotenv"
 
-dotenv.config({ path: "./.env" });  // Load environment variables from.env file
+dotenv.config({ path: ".env" });  // Load environment variables from.env file
 
  // Configuration
 cloudinary.config({ 

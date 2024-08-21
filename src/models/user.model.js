@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt"; 
+import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
     firstname: {
@@ -27,6 +29,9 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     profilePicture: {
+        type: String
+    }, 
+    refreshToken: {
         type: String
     }
 }, { timestamps: true });
