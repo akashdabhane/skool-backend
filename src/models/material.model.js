@@ -24,7 +24,7 @@ const materialSchema = new mongoose.Schema({
         enum: ["Book", "Document", "Video", "Link", "Other"]
     }, 
     fileLink: {
-        type: String,
+        type: [String],
         required: true,
         validate: {
             validator: (v) => {

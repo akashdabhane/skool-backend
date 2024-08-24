@@ -6,10 +6,13 @@ const commentSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    assignment: {
+    assignmentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Assignment",
-        required: true,
+    },
+    materialId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Material",
     },
     commentMessage: {
         type: String,
