@@ -20,14 +20,14 @@ const assignmentSchema = new mongoose.Schema({
         ref: "Class",
         required: true
     }, 
-    file: {
-        type: String,
-        default: null
-    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
+    }, 
+    mediaReference: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MediaReference",
     }
 }, { timestamps: true });
 

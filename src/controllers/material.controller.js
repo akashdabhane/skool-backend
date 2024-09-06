@@ -1,4 +1,5 @@
 import { Material } from '../models/material.model.js';
+import { MediaReference } from '../models/mediaReference.model.js';
 import { User } from '../models/user.model.js';
 import { Class } from '../models/class.model.js';
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -20,11 +21,23 @@ const createMaterial = asyncHandler(async (req, res) => {
     const classroomExists = await Class.findById(classroom);
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
+    const media = await MediaReference.create({
+        videoFile: req?.body?.videoFile, 
+        youtubeVideo: req?.body?.youtubeVideo, 
+        documentFile: req?.body?.documentFile, 
+        Link: req?.body?.link 
+    });
+
+    if(!media) {
+        throw new ApiError(500, "Failed to create media reference");
+    }
+
     const material = await Material.create({
         title,
         description,
         class: classroom,
-        createdBy: user._id
+        createdBy: user._id, 
+        mediaReference: media._id  // save media reference id in material document
     });
 
     if (!material) {
@@ -46,6 +59,8 @@ const deleteMaterial = asyncHandler(async (req, res) => {
     if (!material.createdBy.equals(req.user._id)) {
         throw new ApiError(403, "You do not have permission to delete this material");
     }
+
+    await MediaReference.findByIdAndDelete(material.mediaReference);  // delete media reference first
 
     await Material.findByIdAndDelete(id);
     
