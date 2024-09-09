@@ -22,13 +22,13 @@ const createMaterial = asyncHandler(async (req, res) => {
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
     const media = await MediaReference.create({
-        videoFile: req?.body?.videoFile, 
-        youtubeVideo: req?.body?.youtubeVideo, 
-        documentFile: req?.body?.documentFile, 
-        Link: req?.body?.link 
+        videoFile: req?.body?.videoFile,
+        youtubeVideo: req?.body?.youtubeVideo,
+        documentFile: req?.body?.documentFile,
+        Link: req?.body?.link
     });
 
-    if(!media) {
+    if (!media) {
         throw new ApiError(500, "Failed to create media reference");
     }
 
@@ -36,7 +36,7 @@ const createMaterial = asyncHandler(async (req, res) => {
         title,
         description,
         class: classroom,
-        createdBy: user._id, 
+        createdBy: user._id,
         mediaReference: media._id  // save media reference id in material document
     });
 
@@ -63,7 +63,7 @@ const deleteMaterial = asyncHandler(async (req, res) => {
     await MediaReference.findByIdAndDelete(material.mediaReference);  // delete media reference first
 
     await Material.findByIdAndDelete(id);
-    
+
     return res
         .status(200)
         .json(
@@ -116,6 +116,20 @@ const updateMaterial = asyncHandler(async (req, res) => {
     );
     if (!updatedMaterialInfo) {
         throw new ApiError(500, "Failed to update material information");
+    }
+
+    const updateMediaReference = await MediaReference.findByIdAndUpdate(material.mediaReference,
+        {
+            $set: {
+                videoFile: req?.body?.videoFile,
+                youtubeVideo: req?.body?.youtubeVideo,
+                documentFile: req?.body?.documentFile,
+                Link: req?.body?.link
+            }
+        }, { new: true, runValidators: true }
+    );
+    if(!updateMediaReference) {
+        throw new ApiError(500, "Failed to update media reference information");
     }
 
     return res

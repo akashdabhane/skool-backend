@@ -71,7 +71,12 @@ const userLogin = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required");
     }
 
-    // verify email by regex
+    // Regex for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+        throw new ApiError(400, "Invalid email format");
+    }
 
     if (password.length <= 6 || password.length >= 16) throw new ApiError(400, "Password length must be between 6 to 16 letters.");
 
@@ -100,7 +105,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: { refreshToken: null}
+            $set: { refreshToken: null }
         },
         { new: true }
     )
@@ -215,7 +220,7 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
 
     if (!photo) throw new ApiError(500, "Failed to upload photo");
 
-    if(req.user?.profilePicture) {
+    if (req.user?.profilePicture) {
         const publicId = extractPublicId(req.user.profilePicture);
         await deleteFromCloudinary(publicId);
     }
