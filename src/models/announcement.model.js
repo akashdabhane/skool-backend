@@ -8,7 +8,7 @@ const announcementSchema = new mongoose.Schema({
     }, 
     classroom: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Classroom",
+        ref: "Class",
         required: true,
     }, 
     announceMessage: {
