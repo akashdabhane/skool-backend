@@ -1,6 +1,6 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const mediaReference = new mongoose.Schema({
+const mediaReferenceSchema = new mongoose.Schema({
     videoFile: {
         type: [String],
         // validate: {
@@ -33,11 +33,14 @@ const mediaReference = new mongoose.Schema({
     },
 }, {timestamps: true});
 
-mediaReference.pre("save", async function (next) {
-    if (!this.videoFile && !this.documentFile && !this.link && !this.youtubeVideo) {
+mediaReferenceSchema.pre("save", async function (next) {
+    if ((!this.videoFile || this.videoFile === "") && 
+    (!this.documentFile || this.documentFile==="") && 
+    (!this.link || this.link==="") && 
+    (!this.youtubeVideo || this.youtubeVideo==="")) {
         throw new Error("At least one file (video, document, or link) must be provided.");
     }
     next();
 })
 
-export const MediaReference = mongoose.model("MediaReference", mediaReference);
+export const MediaReference = mongoose.model("MediaReference", mediaReferenceSchema);
