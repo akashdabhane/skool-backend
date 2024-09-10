@@ -8,7 +8,7 @@ const questionSchema = new mongoose.Schema({
     },
     classroom: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Class",
+        ref: "Classroom",
         required: true
     },
     question: {

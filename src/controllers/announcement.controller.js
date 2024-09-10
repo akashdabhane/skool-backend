@@ -1,6 +1,6 @@
 import { Announcement } from "../models/announcement.model.js";
 import { User } from "../models/user.model.js";
-import { Class } from "../models/class.model.js";
+import { Classroom } from "../models/classroom.model.js";
 import { MediaReference } from "../models/mediaReference.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -18,7 +18,7 @@ const createAnnouncement = asyncHandler(async (req, res) => {
     const user = await User.findById(createdBy);
     if (!user) throw new ApiError(401, "User not found");
 
-    const classroomExists = await Class.findById(classroom);
+    const classroomExists = await Classroom.findById(classroom);
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
     const mediaReference = await MediaReference.create({

@@ -1,5 +1,5 @@
 import { Question } from "../models/question.model.js";
-import { Class } from "../models/class.model.js";
+import { Classroom } from "../models/classroom.model.js";
 import { MediaReference } from "../models/mediaReference.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -19,7 +19,7 @@ const createQuestion = asyncHandler(async (req, res) => {
     // }
     validateMongodbId(classroom);
 
-    const classroomExists = await Class.findById(classroom);
+    const classroomExists = await Classroom.findById(classroom);
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
     const mediaReference = await MediaReference.create({
@@ -114,7 +114,7 @@ const getAllQuestionsOfClassroom = asyncHandler(async (req, res) => {
     const { classroomId } = req.params;
     validateMongodbId(classroomId);
 
-    const classroom = await Class.findById(classroomId);
+    const classroom = await Classroom.findById(classroomId);
     if (!classroom) throw new ApiError(404, "Classroom not found");
 
     const questions = await Question.find({ classroom: classroomId });

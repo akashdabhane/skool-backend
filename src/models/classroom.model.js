@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const classSchema = new mongoose.Schema({
+const classroomSchema = new mongoose.Schema({
     classname: {
         type: String,
         required: true,
@@ -20,4 +20,4 @@ const classSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-export const Class = mongoose.model("Class", classSchema);
+export const Classroom = mongoose.model("Classroom", classroomSchema);

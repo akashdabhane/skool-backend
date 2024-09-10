@@ -1,7 +1,7 @@
 import { User } from '../models/user.model.js';
 import { Submission } from '../models/submission.model.js';
 import { Assignment } from "../models/assignment.model.js"
-import { Class } from "../models/class.model.js"
+import { Classroom } from "../models/classroom.model.js"
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -25,7 +25,7 @@ const createSubmission = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id); // student field from here
     if (!user) throw new ApiError(401, "User not found");
 
-    const classroomExists = await Class.findById(assignment.class);
+    const classroomExists = await Classroom.findById(assignment.class);
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
     if (!classroomExists.students.includes(user._id)) {

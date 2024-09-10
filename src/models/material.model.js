@@ -8,7 +8,7 @@ const materialSchema = new mongoose.Schema({
     },
     class: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Class",
+        ref: "Classroom",
         required: true,
     },
     title: {

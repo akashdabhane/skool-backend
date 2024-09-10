@@ -1,4 +1,4 @@
-import { Class } from "../models/class.model.js";
+import { Classroom } from "../models/classroom.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -12,7 +12,7 @@ const createClassroom = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required");
     }
 
-    const newClassroom = await Class.create({
+    const newClassroom = await Classroom.create({
         classname,
         teacher,
         description,
@@ -29,7 +29,7 @@ const deleteClassroom = asyncHandler(async (req, res) => {
     const { id } = req.params;  // classroom id
     const userId = req.user._id;
 
-    const classroom = await Class.findById(id);
+    const classroom = await Classroom.findById(id);
     if (!classroom) {
         throw new ApiError(404, "Classroom not found");
     }
@@ -51,7 +51,7 @@ const deleteClassroom = asyncHandler(async (req, res) => {
 const getAllClassrooms = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
-    const classrooms = await Class.find({
+    const classrooms = await Classroom.find({
         $or: [{ teacher: userId }, { students: userId }],
     });
 
@@ -66,7 +66,7 @@ const getClassroomById = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const classroom = await Class.findById(id);
+    const classroom = await Classroom.findById(id);
     if (!classroom) {
         throw new ApiError(404, "Classroom not found");
     }
@@ -87,7 +87,7 @@ const updateClassroom = asyncHandler(async (req, res) => {
     const { id } = req.params;  // classroom id
     const userId = req.user._id;
 
-    const classroom = await Class.findById(id);
+    const classroom = await Classroom.findById(id);
     if (!classroom) {
         throw new ApiError(404, "Classroom not found");
     }
@@ -96,7 +96,7 @@ const updateClassroom = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You do not have permission to update this classroom");
     }
 
-    const updatedClassroomInfo = await Class.findByIdAndUpdate(id,
+    const updatedClassroomInfo = await Classroom.findByIdAndUpdate(id,
         {
             $set: req.body
         },
@@ -119,7 +119,7 @@ const joinClassroom = asyncHandler(async (req, res) => {
     const { id } = req.params;  // classroom id
     const userId = req.user._id;
 
-    const classroom = await Class.findById(id);
+    const classroom = await Classroom.findById(id);
     if (!classroom) {
         throw new ApiError(404, "Classroom not found");
     }
@@ -150,7 +150,7 @@ const leaveClassroom = asyncHandler(async (req, res) => {
     const { id } = req.params;  // classroom id
     const userId = req.user._id;
 
-    const classroom = await Class.findById(id);
+    const classroom = await Classroom.findById(id);
     if (!classroom) {
         throw new ApiError(404, "Classroom not found");
     }
@@ -159,7 +159,7 @@ const leaveClassroom = asyncHandler(async (req, res) => {
         throw new ApiError(400, "You are not a student in this classroom");
     }
 
-    const updatedClassroomInfo = await Class.findByIdAndUpdate(id,
+    const updatedClassroomInfo = await Classroom.findByIdAndUpdate(id,
         {
             $pull: { students: userId }
         },

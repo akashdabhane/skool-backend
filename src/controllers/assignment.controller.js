@@ -1,6 +1,6 @@
 import { Assignment } from '../models/assignment.model.js';
 import { User } from '../models/user.model.js';
-import { Class } from '../models/class.model.js';
+import { Classroom } from '../models/classroom.model.js';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -17,7 +17,7 @@ const createAssignment = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) throw new ApiError(401, "User not found");
 
-    const classroomExists = await Class.findById(classroom);
+    const classroomExists = await Classroom.findById(classroom);
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
     const assignment = await Assignment.create({
