@@ -28,6 +28,7 @@ import submissionRouter from "./routes/submission.routes.js";
 import commentRouter from "./routes/comment.routes.js";
 import materialRouter from "./routes/material.routes.js";
 import announcementRouter from "./routes/announcement.routes.js";
+import questionRouter from "./routes/question.routes.js";
 
 // routes declaration
 app.use("/api/v1/users", userRouter);
@@ -37,5 +38,6 @@ app.use("/api/v1/submissions", submissionRouter);
 app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/materials", materialRouter);
 app.use("/api/v1/announcements", announcementRouter);
+app.use("/api/v1/questions", questionRouter);
 
 export { app }
