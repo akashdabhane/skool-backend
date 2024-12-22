@@ -24,7 +24,7 @@ const createAssignment = asyncHandler(async (req, res) => {
         title,
         description,
         dueDate,
-        class: classroom,
+        classroom,
         createdBy: user._id
     });
 
@@ -60,7 +60,7 @@ const deleteAssignment = asyncHandler(async (req, res) => {
 // all assignments of classroom
 const getAssignments = asyncHandler(async (req, res) => {
     const { classroom } = req.params;
-    const assignments = await Assignment.find({ class: classroom });
+    const assignments = await Assignment.find({ classroom: classroom });
     if (!assignments) {
         throw new ApiError(404, "No assignments found for this classroom");
     }

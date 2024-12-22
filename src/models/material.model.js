@@ -6,7 +6,7 @@ const materialSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    class: {
+    classroom: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Classroom",
         required: true,

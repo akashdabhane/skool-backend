@@ -15,7 +15,7 @@ const assignmentSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    class: {
+    classroom: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Classroom",
         required: true

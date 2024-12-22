@@ -25,7 +25,7 @@ const createSubmission = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id); // student field from here
     if (!user) throw new ApiError(401, "User not found");
 
-    const classroomExists = await Classroom.findById(assignment.class);
+    const classroomExists = await Classroom.findById(assignment.classroom);
     if (!classroomExists) throw new ApiError(404, "Classroom not found");
 
     if (!classroomExists.students.includes(user._id)) {

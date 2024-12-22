@@ -17,6 +17,11 @@ const classroomSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true,
+    }, 
+    classcode: {
+        type: String,
+        required: true,
+        unique: true,
     }
 }, { timestamps: true });
 

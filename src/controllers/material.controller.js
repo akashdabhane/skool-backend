@@ -35,7 +35,7 @@ const createMaterial = asyncHandler(async (req, res) => {
     const material = await Material.create({
         title,
         description,
-        class: classroom,
+        classroom,
         createdBy: user._id,
         mediaReference: media._id  // save media reference id in material document
     });
@@ -74,7 +74,7 @@ const deleteMaterial = asyncHandler(async (req, res) => {
 // all materials of classroom
 const getMaterials = asyncHandler(async (req, res) => {
     const { classroom } = req.params;
-    const materials = await Material.find({ class: classroom });
+    const materials = await Material.find({ classroom: classroom });
     if (!materials) {
         throw new ApiError(404, "No materials found for this classroom");
     }
