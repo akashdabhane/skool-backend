@@ -18,11 +18,11 @@ const classroomSchema = new mongoose.Schema({
         type: String,
         required: true,
     }, 
-    classcode: {
-        type: String,
-        required: true,
-        unique: true,
-    }
+    // classcode: {
+    //     type: String,
+    //     required: true,
+    //     unique: true,
+    // }
 }, { timestamps: true });
 
 export const Classroom = mongoose.model("Classroom", classroomSchema);

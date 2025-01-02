@@ -13,7 +13,7 @@ materialRouter.use(verifyJWT);
 
 materialRouter.route("/create-material").post(createMaterial);
 materialRouter.route("/get-material/:id").get(getMaterial);
-materialRouter.route("/get-all-material/:id").get(getMaterials);
+materialRouter.route("/get-all-materials/:id").get(getMaterials);
 materialRouter.route("/delete-material/:materialId").delete(deleteMaterial);
 materialRouter.route("/update-material/:id").patch(updateMaterial);
 

@@ -18,6 +18,21 @@ const lectureSchema = new mongoose.Schema({
     duration: {
         type: Number,
         required: true
+    },
+    subject: {
+        type: String,
+        required: true
+    },
+    topic: {
+        type: String,
+    },
+    status: {
+        type: String,
+        enum: ['ongoing', 'scheduled', 'completed'],
+    },
+    schedule: {
+        type: Date,
+        required: true,
     }
 }, { timestamps: true });
 

@@ -73,8 +73,8 @@ const deleteMaterial = asyncHandler(async (req, res) => {
 
 // all materials of classroom
 const getMaterials = asyncHandler(async (req, res) => {
-    const { classroom } = req.params;
-    const materials = await Material.find({ classroom: classroom });
+    const { id } = req.params;  // classroom id
+    const materials = await Material.find({ classroom: id });
     if (!materials) {
         throw new ApiError(404, "No materials found for this classroom");
     }
