@@ -5,20 +5,52 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
+import crypto from "crypto";
+
+const generateClassCode = () => {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+
+    for (let i = 0; i < 6; i += 1) {
+        code += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+
+    return code;
+};
+
+const generateInviteToken = () => crypto.randomBytes(16).toString("hex");
 
 const createClassroom = asyncHandler(async (req, res) => {
-    const { classname, teacher, description } = req.body;
+    const { classname, description } = req.body;
+    const teacherId = req.user?._id;
 
-    if ([classname, teacher, description].some((field) =>
+    if (!req.user?.isTeacher) {
+        throw new ApiError(403, "Only teachers can create classrooms");
+    }
+
+    if ([classname, description].some((field) =>
         field?.trim() === "" || field?.trim() === undefined
     )) {
         throw new ApiError(400, "All fields are required");
     }
 
+    let classCode = generateClassCode();
+    let inviteLinkToken = generateInviteToken();
+
+    while (await Classroom.findOne({ classCode })) {
+        classCode = generateClassCode();
+    }
+
+    while (await Classroom.findOne({ inviteLinkToken })) {
+        inviteLinkToken = generateInviteToken();
+    }
+
     const newClassroom = await Classroom.create({
         classname,
-        teacher,
+        teacher: teacherId,
         description,
+        classCode: classCode.toUpperCase(),
+        inviteLinkToken,
     });
 
     return res
@@ -149,6 +181,73 @@ const joinClassroom = asyncHandler(async (req, res) => {
         )
 })
 
+const joinClassroomByCode = asyncHandler(async (req, res) => {
+    const { code } = req.params;
+    const userId = req.user._id;
+
+    const normalizedCode = code?.trim().toUpperCase();
+    if (!normalizedCode) {
+        throw new ApiError(400, "Class code is required");
+    }
+
+    const classroom = await Classroom.findOne({ classCode: normalizedCode });
+    if (!classroom) {
+        throw new ApiError(404, "Classroom not found");
+    }
+
+    if (classroom.students.includes(userId)) {
+        throw new ApiError(400, "You have already joined this classroom");
+    }
+
+    const updatedClassroomInfo = await Classroom.findByIdAndUpdate(classroom._id,
+        {
+            $push: { students: userId }
+        },
+        { new: true }
+    );
+
+    if (!updatedClassroomInfo) {
+        throw new ApiError(500, "Failed to join classroom");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedClassroomInfo, "student joined classroom")
+        );
+});
+
+const joinClassroomByLink = asyncHandler(async (req, res) => {
+    const { token } = req.params;
+    const userId = req.user._id;
+
+    const classroom = await Classroom.findOne({ inviteLinkToken: token });
+    if (!classroom) {
+        throw new ApiError(404, "Classroom not found");
+    }
+
+    if (classroom.students.includes(userId)) {
+        throw new ApiError(400, "You have already joined this classroom");
+    }
+
+    const updatedClassroomInfo = await Classroom.findByIdAndUpdate(classroom._id,
+        {
+            $push: { students: userId }
+        },
+        { new: true }
+    );
+
+    if (!updatedClassroomInfo) {
+        throw new ApiError(500, "Failed to join classroom");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedClassroomInfo, "student joined classroom")
+        );
+});
+
 const leaveClassroom = asyncHandler(async (req, res) => {
     const { id } = req.params;  // classroom id
     const userId = req.user._id;
@@ -179,6 +278,37 @@ const leaveClassroom = asyncHandler(async (req, res) => {
             new ApiResponse(200, updatedClassroomInfo, "student left classroom")
         );
 })
+
+const kickStudent = asyncHandler(async (req, res) => {
+    const { classId, studentId } = req.params;
+    const userId = req.user._id;
+
+    const classroom = await Classroom.findById(classId);
+    if (!classroom) {
+        throw new ApiError(404, "Classroom not found");
+    }
+
+    if (!classroom.teacher.equals(userId)) {
+        throw new ApiError(403, "You do not have permission to remove students");
+    }
+
+    if (!classroom.students.includes(studentId)) {
+        throw new ApiError(400, "Student is not in this classroom");
+    }
+
+    const updatedClassroom = await Classroom.findByIdAndUpdate(classId,
+        {
+            $pull: { students: studentId }
+        },
+        { new: true }
+    );
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedClassroom, "Student removed successfully")
+        );
+});
 
 
 const getAssignmentsAndMaterials = asyncHandler(async (req, res) => {
@@ -243,14 +373,14 @@ const getConnectedPeople = asyncHandler(async (req, res) => {
         {
             $project: {
                 _id: 1,
-                // connectedTeachers: 1,
-                // connectedStudents: 1,
+                "connectedTeachers._id": 1,
                 "connectedTeachers.firstname": 1,
                 "connectedTeachers.lastname": 1,
-                "connectedTeachers.profileImage": 1,
+                "connectedTeachers.profilePicture": 1,
+                "connectedStudents._id": 1,
                 "connectedStudents.firstname": 1,
                 "connectedStudents.lastname": 1,
-                "connectedStudents.profileImage": 1,
+                "connectedStudents.profilePicture": 1,
             }
         }
     ])
@@ -269,7 +399,10 @@ export {
     getClassroomById,
     updateClassroom,
     joinClassroom,
+    joinClassroomByCode,
+    joinClassroomByLink,
     leaveClassroom,
+    kickStudent,
     getAssignmentsAndMaterials,
     getConnectedPeople,
 }

@@ -293,8 +293,8 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
 // reset password functionality
 const resetPassword = asyncHandler(async (req, res) => {
-    const { password } = req.body;  // token, 
-    const { token } = req.params;
+    const { password, token: bodyToken } = req.body;  // token, 
+    const token = req.params?.token || bodyToken;
 
     if (!token) {
         throw new ApiError(400, "Token is required")

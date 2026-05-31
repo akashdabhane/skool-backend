@@ -5,17 +5,18 @@ import { MediaReference } from "../models/mediaReference.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { emitNotificationToUsers } from "../utils/notificationEmitter.js";
 
 const createAnnouncement = asyncHandler(async (req, res) => {
-    const { createdBy, announceMessage, classroom } = req.body;
+    const { announceMessage, classroom } = req.body;
 
-    if ([createdBy, announceMessage, classroom].some(field => {
+    if ([announceMessage, classroom].some(field => {
         return field?.trim() === "" || field?.trim() === undefined
     })) {
         throw new ApiError(400, "All fields are required");
     }
 
-    const user = await User.findById(createdBy);
+    const user = await User.findById(req.user._id);
     if (!user) throw new ApiError(401, "User not found");
 
     const classroomExists = await Classroom.findById(classroom);
@@ -35,10 +36,24 @@ const createAnnouncement = asyncHandler(async (req, res) => {
         mediaReference: mediaReference._id
     });
 
+    const populatedAnnouncement = await announcement.populate("createdBy");
+
+    const classroomRecord = await Classroom.findById(classroom);
+    if (classroomRecord) {
+        const recipientIds = [classroomRecord.teacher, ...(classroomRecord.students || [])];
+        await emitNotificationToUsers({
+            userIds: recipientIds,
+            classroom: classroomRecord._id,
+            type: "announcement",
+            message: `New announcement in ${classroomRecord.classname}`,
+            link: `/c/stream/${classroomRecord._id}`
+        });
+    }
+
     return res
         .status(200)
         .json(
-            new ApiResponse(200, announcement, "Announcement created successfully")
+            new ApiResponse(200, populatedAnnouncement, "Announcement created successfully")
         );
 })
 

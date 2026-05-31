@@ -1,6 +1,8 @@
 import dotenv from "dotenv"
+import http from "http";
 import { connectDB } from "./database/connection.js"
 import { app } from "./app.js";
+import { setupSocket } from "./socket.js";
 
 
 dotenv.config({ path: "./.env" });
@@ -14,7 +16,10 @@ connectDB()
             throw error
         })
 
-        app.listen(process.env.PORT || 8000, () => {
+        const httpServer = http.createServer(app);
+        setupSocket(httpServer);
+
+        httpServer.listen(process.env.PORT || 8000, () => {
             console.log(`server is running of port ${process.env.PORT || 8000}`);
         })
     })

@@ -6,8 +6,11 @@ import {
     getAllClassrooms,
     getClassroomById, 
     joinClassroom, 
+    joinClassroomByCode,
+    joinClassroomByLink,
     updateClassroom, 
     leaveClassroom,
+    kickStudent,
     getAssignmentsAndMaterials,
     getConnectedPeople
 } from "../controllers/classroom.controller.js"
@@ -21,7 +24,10 @@ classroomRouter.route('/get-all-classrooms').get(getAllClassrooms);
 classroomRouter.route('/get-classroom/:id').get(getClassroomById);
 classroomRouter.route('/update-classroom-info/:id').patch(updateClassroom);
 classroomRouter.route('/join-classroom/:id').patch(joinClassroom);
+classroomRouter.route('/join-by-code/:code').patch(joinClassroomByCode);
+classroomRouter.route('/join-by-link/:token').patch(joinClassroomByLink);
 classroomRouter.route('/leave-classroom/:id').patch(leaveClassroom);
+classroomRouter.route('/kick-student/:classId/:studentId').patch(kickStudent);
 classroomRouter.route('/get-assignments-materials/:id').get(getAssignmentsAndMaterials);
 classroomRouter.route('/get-connected-users/:id').get(getConnectedPeople);
 

@@ -16,11 +16,20 @@ const chatMessageSchema = new mongoose.Schema({
         required: true,
         minlength: 1,
     },
-    attactment: {
+    attachment: {
         type: String,
         required: false,
         default: "",
     },
+    isRead: {
+        type: Boolean,
+        default: false,
+    },
+    messageType: {
+        type: String,
+        enum: ["text", "file"],
+        default: "text",
+    }
 
 
     // receiver: {

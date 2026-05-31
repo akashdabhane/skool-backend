@@ -31,6 +31,12 @@ import commentRouter from "./routes/comment.routes.js";
 import materialRouter from "./routes/material.routes.js";
 import announcementRouter from "./routes/announcement.routes.js";
 import questionRouter from "./routes/question.routes.js";
+import resourceRouter from "./routes/resource.routes.js";
+import lectureRouter from "./routes/lecture.routes.js";
+import chatRouter from "./routes/chat.routes.js";
+import notificationRouter from "./routes/notification.routes.js";
+import examRouter from "./routes/exam.routes.js";
+import analyticsRouter from "./routes/analytics.routes.js";
 
 // routes declaration
 app.use("/api/v1/users", userRouter);
@@ -41,5 +47,11 @@ app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/materials", materialRouter);
 app.use("/api/v1/announcements", announcementRouter);
 app.use("/api/v1/questions", questionRouter);
+app.use("/api/v1/resources", resourceRouter);
+app.use("/api/v1/lectures", lectureRouter);
+app.use("/api/v1/chats", chatRouter);
+app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/exams", examRouter);
+app.use("/api/v1/analytics", analyticsRouter);
 
 export { app }

@@ -21,6 +21,7 @@ const createSubmission = asyncHandler(async (req, res) => {
     }
 
     const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) throw new ApiError(404, "Assignment not found");
 
     const user = await User.findById(req.user._id); // student field from here
     if (!user) throw new ApiError(401, "User not found");
@@ -33,20 +34,52 @@ const createSubmission = asyncHandler(async (req, res) => {
     }
 
     const assignmentFile = await uploadOnCloudinary(localFilePath);
+    if (!assignmentFile) {
+        throw new ApiError(500, "Failed to upload submission file");
+    }
 
     // compare dueDate and current for marking isLate
     // Check if the uploadDate is after the dueDate
-    let isLate = false;
-    if (new Date(Date.now()) > new Date(assignment.dueDate)) {      // const dueDate = new Date('2024-08-22'); // Example due date
-        isLate = true;
-    }
+    const now = new Date();
+    const isLate = now > new Date(assignment.dueDate);
 
-    const submission = await Submission.create({        // is there any need to add classroom information
-        fileLink: assignmentFile.secure_url,
+    const existingSubmission = await Submission.findOne({
         assignment: assignmentId,
         student: user._id,
-        isLate
     });
+
+    let submission;
+
+    if (existingSubmission) {
+        if (now > new Date(assignment.dueDate)) {
+            throw new ApiError(400, "Resubmissions are only allowed before the deadline");
+        }
+
+        const publicId = extractPublicId(existingSubmission.fileLink);
+        await deleteFromCloudinary(publicId);
+
+        submission = await Submission.findByIdAndUpdate(existingSubmission._id,
+            {
+                $set: {
+                    fileLink: assignmentFile.secure_url,
+                    status: "resubmitted",
+                    lastSubmittedAt: now,
+                },
+                $inc: { attemptCount: 1 },
+            },
+            { new: true }
+        );
+    } else {
+        submission = await Submission.create({
+            fileLink: assignmentFile.secure_url,
+            assignment: assignmentId,
+            student: user._id,
+            isLate,
+            status: "submitted",
+            submittedAt: now,
+            lastSubmittedAt: now,
+        });
+    }
 
     if (!submission) throw new ApiError(500, "Failed to create submission");
 
@@ -54,6 +87,19 @@ const createSubmission = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(201, { submission }, "Submission created successfully")
+        );
+});
+
+const getSubmissionStatus = asyncHandler(async (req, res) => {
+    const { assignmentId } = req.params;
+    const userId = req.user._id;
+
+    const submission = await Submission.findOne({ assignment: assignmentId, student: userId });
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, submission, "Submission status fetched successfully")
         );
 });
 
@@ -116,4 +162,5 @@ export {
     deleteSubmission,
     getAllSubmissions,
     getSubmission,
+    getSubmissionStatus,
 }

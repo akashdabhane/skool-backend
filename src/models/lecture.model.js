@@ -19,6 +19,10 @@ const lectureSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    title: {
+        type: String,
+        required: true
+    },
     subject: {
         type: String,
         required: true
@@ -28,11 +32,28 @@ const lectureSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['ongoing', 'scheduled', 'completed'],
+        enum: ['ongoing', 'scheduled', 'completed', 'cancelled'],
+        default: 'scheduled'
     },
-    schedule: {
+    scheduleStart: {
         type: Date,
         required: true,
+    },
+    scheduleEnd: {
+        type: Date,
+        required: true,
+    },
+    isRecurring: {
+        type: Boolean,
+        default: false,
+    },
+    recurrenceRule: {
+        type: String,
+        default: "",
+    },
+    cancelReason: {
+        type: String,
+        default: "",
     }
 }, { timestamps: true });
 

@@ -5,6 +5,18 @@ const classroomSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    classCode: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: 5,
+        maxlength: 10,
+    },
+    inviteLinkToken: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     teacher: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

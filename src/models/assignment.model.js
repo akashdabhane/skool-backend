@@ -11,6 +11,11 @@ const assignmentSchema = new mongoose.Schema({
         minlength: 2,
         maxlength: 500
     },
+    points: {
+        type: Number,
+        default: null,
+        min: 0
+    },
     dueDate: {
         type: Date,
         required: true
